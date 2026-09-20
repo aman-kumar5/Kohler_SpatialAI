@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Environment variables / secrets
+.env
+*.env
+
+# VS Code
+.vscode/
+
+# AI/ML model files
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+
+# Vector databases
+chroma_db/
+vector_store/
+chroma/
+*.sqlite3
+
+# Node
+node_modules/
+
+# Build
+dist/
+build/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output
+build-output/
+
+# Bundled Node.js
+tools/
+
+# Dependencies
+node_modules/

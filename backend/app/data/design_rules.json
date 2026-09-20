@@ -1,0 +1,10 @@
+{
+  "planning_assumptions_disclaimer": "Installation envelopes are configurable design planning assumptions for physical fixture feasibility.",
+  "installation_envelopes": {
+    "shower": {
+      "min_width_mm": 900,
+      "min_depth_mm": 900,
+      "label": "Shower wet-zone installation envelope"
+    }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "weights": {
+    "explicit_metadata": 100,
+    "keyword_match": 85,
+    "collection_match": 70,
+    "feature_text_match": 50,
+    "style_conflict": 30
+  },
+  "style_dictionary": {
+    "modern": {
+      "synonyms": ["modern", "contemporary", "minimalist", "clean", "sleek", "avant-garde", "wall-hung", "smart", "touchless"],
+      "collections": ["veil", "forefront", "brazn", "modernlife", "edge", "vive", "composed", "parallel", "accliv", "reach", "span", "mica", "aleo", "beam", "purist", "components", "singulier", "stille", "formia", "moxie", "daisyfield"],
+      "conflict_styles": ["classical", "industrial"]
+    },
+    "classical": {
+      "synonyms": ["classical", "classic", "traditional", "vintage", "heritage", "ornate"],
+      "collections": ["memoirs", "finial", "conical bell", "san raphael", "artifacts", "devonshire", "kelston", "tressam"],
+      "conflict_styles": ["modern", "industrial"]
+    },
+    "industrial": {
+      "synonyms": ["industrial", "urban", "raw", "utilitarian", "exposed", "matte"],
+      "collections": ["statement", "strata", "stria"],
+      "conflict_styles": ["classical"]
+    },
+    "scandinavian": {
+      "synonyms": ["scandinavian", "nordic", "light wood", "minimalist", "clean", "simple", "functional", "natural"],
+      "collections": ["span", "mica", "aleo", "beam", "forefront", "reach", "cimarron"],
+      "conflict_styles": ["classical"]
+    },
+    "minimal": {
+      "synonyms": ["minimalist", "minimal", "clean", "simple", "nordic"],
+      "collections": ["span", "mica", "aleo", "beam", "cimarron"],
+      "conflict_styles": ["classical"]
+    }
+  }
+}
