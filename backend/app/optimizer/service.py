@@ -281,11 +281,11 @@ def _place_fixtures(
     sorted_patterns = sorted(by_pattern.keys(), key=lambda pat: len(set(side for _, side in pat)), reverse=True)
 
     combos_to_test = []
-    # Sample up to 10 candidates per wall pattern to cover every room layout configuration
+    # Sample up to 8 candidates per wall pattern to cover every room layout configuration
     for pat in sorted_patterns:
-        combos_to_test.extend(by_pattern[pat][:10])
+        combos_to_test.extend(by_pattern[pat][:8])
 
-    combos_to_test = combos_to_test[:96]
+    combos_to_test = combos_to_test[:48]
 
 
 
