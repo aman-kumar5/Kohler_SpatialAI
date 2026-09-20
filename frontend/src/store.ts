@@ -325,14 +325,24 @@ export const useDesignStore = create<DesignState>((set, get) => ({
     const pending = state.pendingImprovement;
     const current = state.designs[state.activeDesignIdx];
     if (!pending || !current) return;
+    const proposal = pending.proposal;
     const room = current.room || state.wizardData.room;
-    // Re-evaluate at commit time. A failed or over-budget proposal can never replace current design.
-    const verified = await api.evaluate(room, pending.proposal.fixtures, state.wizardData.budget_inr, state.wizardData.style, current.name);
-    if (!verified.validation.valid || verified.validation.total_price_inr > state.wizardData.budget_inr) {
+
+    // Verify layout validity and budget limits of the proposal
+    if (!proposal.validation.valid || proposal.validation.total_price_inr > state.wizardData.budget_inr) {
       throw new Error('The proposal no longer meets spatial or budget constraints and was not applied.');
     }
-    get().updateActiveDesign({ ...verified, name: current.name, aiOptimized: true, room });
-    set((s) => ({ versions: [...s.versions, { ...verified, name: current.name, aiOptimized: true, room }], pendingImprovement: null }));
+    const updatedDesign: Design = {
+      ...proposal,
+      name: current.name,
+      aiOptimized: true,
+      room,
+    };
+    get().updateActiveDesign(updatedDesign);
+    set((s) => ({
+      versions: [...s.versions, updatedDesign],
+      pendingImprovement: null,
+    }));
   },
 
   rejectPendingImprovement: () => set({ pendingImprovement: null }),

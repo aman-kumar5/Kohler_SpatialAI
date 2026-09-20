@@ -92,17 +92,25 @@ def _ranked_product_combinations(
         yield tuple(choices[index] for choices, index in zip(ordered_lists, reversed(indexes)))
 
 
+_style_cache: dict[tuple[str, str | None], float] = {}
+
 def _sort_key(profile: str, p: ProductRow, budget: int, style: str | None) -> float:
-    from .scoring import compute_style_match
-    p_style_score, _, _ = compute_style_match([p], style)
-    style_val = p_style_score if p_style_score is not None else 50.0
+    cache_key = (p.sku, style)
+    if cache_key in _style_cache:
+        style_val = _style_cache[cache_key]
+    else:
+        from .scoring import compute_style_match
+        p_style_score, _, _ = compute_style_match([p], style)
+        style_val = p_style_score if p_style_score is not None else 50.0
+        _style_cache[cache_key] = style_val
 
     if profile == 'cheapest':
-        return float(p.price_inr)
+        conflict_penalty = 10000.0 if (style and style_val <= 35.0) else 0.0
+        return float(p.price_inr) + conflict_penalty - (style_val * 10.0)
     if profile == 'premium':
-        return - (float(p.price_inr) * 1000.0 + style_val)
+        return - (float(p.price_inr) * 10.0 + style_val * 500.0)
     target = (budget * 0.55) / 3
-    return abs(p.price_inr - target) - (style_val * 0.1)
+    return abs(p.price_inr - target) - (style_val * 50.0)
 
 
 def _shower_wall_candidates(
@@ -111,7 +119,7 @@ def _shower_wall_candidates(
     """Generate shower candidates on ALL FOUR WALLS with physical wall orientation matching 3D."""
     candidates: list[tuple[int, int, int]] = []
     wall_rotations = {'south': 0, 'west': 90, 'north': 180, 'east': 270}
-    offsets = [0.50, 0.25, 0.75, 0.0, 1.0, 0.15, 0.85]
+    offsets = [0.50, 0.25, 0.75, 0.20, 0.35, 0.65, 0.80, 0.0, 1.0, 0.15, 0.85]
 
     for wall in ('south', 'north', 'west', 'east'):
         rot = wall_rotations[wall]
@@ -154,7 +162,7 @@ def _category_wall_candidates(
         return _shower_wall_candidates(room_w, room_d, fix_w, fix_d)
 
     candidates: list[tuple[int, int, int]] = []
-    offsets = [0.50, 0.25, 0.75, 0.0, 1.0, 0.15, 0.85]
+    offsets = [0.50, 0.25, 0.75, 0.20, 0.35, 0.65, 0.80, 0.0, 1.0, 0.15, 0.85]
     wall_rotations = {'south': 0, 'west': 90, 'north': 180, 'east': 270}
 
     if category == 'toilet':
@@ -187,7 +195,6 @@ def _category_wall_candidates(
         elif wall == 'south':
             for r in offsets:
                 candidates.append((int(max_x * r), 0, rot))
-
 
     seen: set[tuple[int, int, int]] = set()
     unique: list[tuple[int, int, int]] = []
@@ -446,11 +453,28 @@ def generate(request: GenerateRequest) -> list[Design]:
             for cat in request.categories
         }
 
-        # Product combinations are intentionally small (top three catalog picks
-        # per category) and fully ranked; only the much larger placement space
-        # requires lazy sampling.
+        from .scoring import compute_style_match
+
+        # Pre-cache individual product style scores to avoid recomputation
+        style_score_cache: dict[str, float] = {}
+        for cat in request.categories:
+            for p in category_sorted[cat][:3]:
+                if p.sku not in style_score_cache:
+                    s, _, _ = compute_style_match([p], spec.style)
+                    style_score_cache[p.sku] = s if s is not None else 50.0
+
         combos = list(itertools.product(*(category_sorted[cat][:3] for cat in request.categories)))
-        combos.sort(key=lambda combo: sum(_sort_key(profile, product, budget, spec.style) for product in combo))
+
+        def _combo_sort_key(combo):
+            # Fast cached style + compatibility scoring without calling full functions
+            avg_style = sum(style_score_cache.get(p.sku, 50.0) for p in combo) / len(combo)
+            # Collection cohesion bonus (same collection => higher compatibility)
+            collections = set(p.collection.lower() for p in combo if p.collection and p.collection.strip())
+            compat_bonus = 100.0 if len(collections) <= 1 else 85.0
+            indiv_sort = sum(_sort_key(profile, p, budget, spec.style) for p in combo)
+            return indiv_sort - (compat_bonus * 100.0) - (avg_style * 200.0)
+
+        combos.sort(key=_combo_sort_key)
         stats['generated_candidates'] += len(combos)
         log_perf('sorting/ranking candidates', ranking_started)
 
@@ -508,7 +532,7 @@ def generate(request: GenerateRequest) -> list[Design]:
                 best_design = candidate_design
 
             eval_count += 1
-            if eval_count >= 5:
+            if eval_count >= 8:
                 break
 
         if best_design is not None:

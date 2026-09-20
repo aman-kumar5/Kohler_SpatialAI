@@ -9,27 +9,27 @@
   "style_dictionary": {
     "modern": {
       "synonyms": ["modern", "contemporary", "minimalist", "clean", "sleek", "avant-garde", "wall-hung", "smart", "touchless"],
-      "collections": ["veil", "forefront", "brazn", "modernlife", "edge", "vive", "composed", "parallel", "accliv", "reach", "span", "mica", "aleo", "beam", "purist", "components", "singulier", "stille", "formia", "moxie", "daisyfield"],
-      "conflict_styles": ["classical", "industrial"]
+      "collections": ["veil", "forefront", "brazn", "modernlife", "edge", "vive", "composed", "parallel", "accliv", "reach", "span", "mica", "aleo", "beam", "purist", "components", "singulier", "stille", "formia", "moxie", "daisyfield", "luxe", "prologue"],
+      "conflict_styles": ["classical"]
     },
     "classical": {
-      "synonyms": ["classical", "classic", "traditional", "vintage", "heritage", "ornate"],
-      "collections": ["memoirs", "finial", "conical bell", "san raphael", "artifacts", "devonshire", "kelston", "tressam"],
+      "synonyms": ["classical", "classic", "traditional", "vintage", "heritage", "ornate", "timeless", "elegant"],
+      "collections": ["memoirs", "finial", "conical bell", "san raphael", "artifacts", "devonshire", "kelston", "tressam", "luxe", "prologue", "caxton", "ladena", "reach"],
       "conflict_styles": ["modern", "industrial"]
     },
     "industrial": {
-      "synonyms": ["industrial", "urban", "raw", "utilitarian", "exposed", "matte"],
-      "collections": ["statement", "strata", "stria"],
+      "synonyms": ["industrial", "urban", "raw", "utilitarian", "exposed", "matte", "bold", "statement", "black", "dark"],
+      "collections": ["statement", "strata", "stria", "brazn", "vive", "components", "purist", "parallel", "accliv"],
       "conflict_styles": ["classical"]
     },
     "scandinavian": {
-      "synonyms": ["scandinavian", "nordic", "light wood", "minimalist", "clean", "simple", "functional", "natural"],
-      "collections": ["span", "mica", "aleo", "beam", "forefront", "reach", "cimarron"],
+      "synonyms": ["scandinavian", "nordic", "light wood", "minimalist", "clean", "simple", "functional", "natural", "modern"],
+      "collections": ["span", "mica", "aleo", "beam", "forefront", "reach", "cimarron", "luxe", "prologue", "modernlife"],
       "conflict_styles": ["classical"]
     },
     "minimal": {
-      "synonyms": ["minimalist", "minimal", "clean", "simple", "nordic"],
-      "collections": ["span", "mica", "aleo", "beam", "cimarron"],
+      "synonyms": ["minimalist", "minimal", "clean", "simple", "nordic", "modern"],
+      "collections": ["span", "mica", "aleo", "beam", "cimarron", "forefront", "luxe", "modernlife"],
       "conflict_styles": ["classical"]
     }
   }

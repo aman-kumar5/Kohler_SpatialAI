@@ -111,18 +111,18 @@ def improve_design(body: ImproveRequest):
             baseline, _, _ = compute_style_match(improved_products, style)
             baseline_val = baseline or 0.0
             best_prod = None
-            best_val = baseline_val - 5.0  # Allow minor 5-pt score tolerance to find alternative style options
+            best_val = baseline_val
             for item in cat_candidates:
                 if item.sku == p.sku:
                     continue
                 trial = list(improved_products); trial[i] = item
                 s, _, _ = compute_style_match(trial, style)
-                if s is not None and s >= best_val:
+                if s is not None and s > best_val:
                     best_val = s
                     best_prod = item
             if best_prod:
                 improved_products[i] = best_prod
-                recommendation_reason = f"Replaced {p.name} with {best_prod.name} to optimize style match ({best_val:.0f}/100)."
+                recommendation_reason = f"Replaced {p.name} with {best_prod.name} ({best_prod.style or 'matching'} style) to increase style match score from {baseline_val:.0f} to {best_val:.0f}/100."
 
         elif 'budget' in metric or 'cost' in metric:
             # Step down incrementally: find the next cheapest product just below current price
@@ -142,23 +142,34 @@ def improve_design(body: ImproveRequest):
             from .spatial.compatibility import evaluate_compatibility
             baseline = evaluate_compatibility(improved_products).score or 0.0
             best_prod = None
-            best_score = baseline - 5.0  # Allow minor 5-pt score tolerance for alternative compatible options
+            best_score = baseline
             for item in cat_candidates:
                 if item.sku == p.sku:
                     continue
                 trial = list(improved_products); trial[i] = item
                 s = evaluate_compatibility(trial).score or 0.0
-                if s >= best_score:
+                if s > best_score:
                     best_score = s
                     best_prod = item
             if best_prod:
                 improved_products[i] = best_prod
-                recommendation_reason = f"Replaced {p.name} with {best_prod.name} to optimize compatibility."
+                recommendation_reason = f"Replaced {p.name} with {best_prod.name} to increase compatibility score from {baseline:.0f} to {best_score:.0f}/100."
 
     from .optimizer.service import _place_fixtures
     placements = _place_fixtures(improved_products, room.width_mm, room.depth_mm, budget, room)
     if placements is None:
-        placements = design.fixtures
+        # Sync old fixture placements to use corresponding new product SKUs
+        placements = []
+        for f in design.fixtures:
+            matching_p = next((p for p in design.products if p.sku == f.sku), None)
+            if matching_p:
+                new_p = next((np for np in improved_products if np.category == matching_p.category), None)
+                if new_p:
+                    placements.append(FixturePlacement(sku=new_p.sku, x_mm=f.x_mm, y_mm=f.y_mm, rotation_deg=f.rotation_deg))
+                else:
+                    placements.append(f)
+            else:
+                placements.append(f)
 
     val_res = validate_layout(LayoutRequest(room=room, fixtures=placements, budget_inr=budget))
     from .optimizer.scoring import compute_design_score
