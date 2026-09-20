@@ -4,7 +4,7 @@ import type {
   DesignComparison,
 } from './types';
 
-const BASE = 'http://localhost:8000';
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 async function request<T>(path: string, body?: unknown): Promise<T> {
   const r = await fetch(BASE + path, {
