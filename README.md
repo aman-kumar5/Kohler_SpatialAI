@@ -1,10 +1,10 @@
-KOHLER SpatialAI
+SpatialAI
 
 AI-Powered Bathroom Digital Twin & Spatial Product Optimization Platform
 
 From "Looks Good" to "Actually Fits."
 
-KOHLER SpatialAI is an AI-assisted bathroom design and planning platform combining natural-language AI, real KOHLER product data, deterministic computational geometry, constraint validation, optimization, and interactive 2D/3D visualization.
+SpatialAI is an AI-assisted bathroom design and planning platform combining natural-language AI, real KOHLER product data, deterministic computational geometry, constraint validation, optimization, and interactive 2D/3D visualization.
 
 AI Proposes → Catalog Verifies → Geometry Validates → Scoring Evaluates → Optimization Decides → User Remains in Control.
 
